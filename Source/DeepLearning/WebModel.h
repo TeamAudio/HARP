@@ -105,14 +105,15 @@ public:
             .getChildFile("control_spec.json");
     outputPath.deleteFile();
 
-
-    // juce::File scriptPath = juce::File::getSpecialLocation(
-    //     juce::File::currentApplicationFile
-    // ).getChildFile("Contents/Resources/gradiojuce_client/gradiojuce_client");
-
-    juce::File scriptPath = juce::File::getSpecialLocation(
+    #if JUCE_MAC
+      juce::File scriptPath = juce::File::getSpecialLocation(
         juce::File::currentApplicationFile
-    ).getParentDirectory().getChildFile("gradiojuce_client/gradiojuce_client.exe");
+      ).getChildFile("Contents/Resources/gradiojuce_client/gradiojuce_client");
+    #else
+      juce::File scriptPath = juce::File::getSpecialLocation(
+          juce::File::currentApplicationFile
+      ).getChildFile("../../Resources/dist/gradiojuce_client/gradiojuce_client");
+    #endif
 
     juce::File tempLogFile =
     juce::File::getSpecialLocation(juce::File::tempDirectory)
