@@ -28,9 +28,7 @@
 #include "../ARA/AudioModification.h"
 
 
-struct WaveformCache :
-    // private juce::ARAAudioSource::Listener,
-                      private juce::ARAAudioModification::Listener {
+struct WaveformCache : private juce::ARAAudioModification::Listener {
   WaveformCache() : thumbnailCache(20) {}
 
   ~WaveformCache() override {
@@ -40,22 +38,13 @@ struct WaveformCache :
   }
 
   //==============================================================================
-  // void willDestroyAudioSource(juce::ARAAudioSource *audioSource) override {
-  //   removeAudioSource(audioSource);
-  // }
-
   void willDestroyAudioModification (juce::ARAAudioModification* audioModification) override {
-    DBG("willDestroyAudioModification");
     removeAudioModification(audioModification);
   }
 
   juce::AudioThumbnail &getOrCreateThumbnail(juce::ARAAudioSource *audioSource,
                                        AudioModification *audioModification) {
-    // const auto iter = thumbnails.find(audioSource);
     const auto iter = thumbnails.find(audioModification);
-    // bool aa = iterMod != std::end(thumbnailsMod);
-    DBG("\n\n\nAddress of audioSource: ", audioSource);
-    DBG("Address of audioModification: ", audioModification);
 
     // if a thumbnail was found for this source,
     if (iter != std::end(thumbnails))
@@ -65,7 +54,6 @@ struct WaveformCache :
         // That's why we'll check if a thumbnail has been
         // created for the latest processing step.
         if (audioModification->isThumbCreated()){
-          DBG("    No new processing - thumb is already created");
           // it means the current thumbnail is the updated one,
           // and we just need to return it.
           return *iter->second;
@@ -76,7 +64,7 @@ struct WaveformCache :
           // to update it.
           ++hash;
           iter->second->setSource(audioModification->getModifiedAudioBuffer(),
-                       audioModification->getDawSampleRate(), hash);
+                              audioModification->getDawSampleRate(), hash);
           audioModification->setThumbCreated(true);
           return *iter->second;
         }
@@ -96,13 +84,11 @@ struct WaveformCache :
     ++hash;
     if (audioModification->getIsModified())
       thumb->setSource(audioModification->getModifiedAudioBuffer(),
-                       audioModification->getDawSampleRate(), hash);
+                      audioModification->getDawSampleRate(), hash);
 
     else
       thumb->setReader(new juce::ARAAudioSourceReader(audioSource), hash);
 
-    // audioSource->addListener(this);
-    // thumbnails.emplace(audioSource, std::move(thumb));
     audioModification->addListener(this);
     thumbnails.emplace(audioModification, std::move(thumb));
     audioModification->setThumbCreated(true);
@@ -110,10 +96,6 @@ struct WaveformCache :
   }
 
 private:
-  // void removeAudioSource(juce::ARAAudioSource *audioSource) {
-  //   audioSource->removeListener(this);
-  //   thumbnails.erase(audioSource);
-  // }
   void removeAudioModification(juce::ARAAudioModification *audioModification) {
     audioModification->removeListener(this);
     thumbnails.erase(audioModification);
@@ -122,6 +104,5 @@ private:
   juce::int64 hash = 0;
   juce::AudioFormatManager dummyManager;
   juce::AudioThumbnailCache thumbnailCache;
-  // std::map<juce::ARAAudioSource *, unique_ptr<juce::AudioThumbnail>> thumbnails;
   std::map<juce::ARAAudioModification *, unique_ptr<juce::AudioThumbnail>> thumbnails;
 };
