@@ -97,7 +97,6 @@ void AudioModification::process(std::shared_ptr<WebWave2Wave> model, double dawS
     juce::Range<float> results;
     mAudioSourceReader->readMaxLevels(0, mAudioSourceReader->lengthInSamples, &results, 1);
     DBG("AudioModification:: max level: " << results.getStart() << " " << results.getEnd());
-    DBG("is valid audio source reader: ", mAudioSourceReader->isValid());
     mAudioSourceReader->read(mAudioBuffer.get(), 0,
                              static_cast<int>(numSamples), 0, true, true);
     float bufferRMS = mAudioBuffer->getRMSLevel(0, 0, mAudioBuffer->getNumSamples());
