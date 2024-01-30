@@ -11,10 +11,10 @@ struct Endpoint {
         return path.substr(0, path.find('/'));
     }
 
-    static const std::vector<Endpoint> All;
+    static const std::vector<Endpoint> all;
 };
 
-const std::vector<Endpoint> Endpoint::All = {
+const std::vector<Endpoint> Endpoint::all = {
     {"TA Variations", "TechAudio/ldm_variations"},
     {"TA Style Transfer", "TechAudio/ldm_styletransfer"},
     {"TA Diffusers", "TechAudio/diffusers_HARP_test"},

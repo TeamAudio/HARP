@@ -22,7 +22,7 @@
  */
 
 #include "ProcessorEditor.h"
-#include "../DeepLearning/Endpoints.h"
+#include "../DeepLearning/Endpoint.h"
 #include "../DeepLearning/WebModel.h"
 
 HARPProcessorEditor::HARPProcessorEditor(
@@ -100,7 +100,7 @@ HARPProcessorEditor::HARPProcessorEditor(
 
   // model combobox
   int itemId = 1;
-  for (auto &endpoint : Endpoint::All) {
+  for (auto &endpoint : Endpoint::all) {
     modelMenu.addItem(endpoint.name + " (" + endpoint.author() + ")", itemId++);
   }
   modelMenu.onChange = [this] { modelMenuChanged(); };
@@ -160,7 +160,7 @@ HARPProcessorEditor::HARPProcessorEditor(
 
 void HARPProcessorEditor::modelMenuChanged() {
   auto id = modelMenu.getSelectedId();
-  auto path = Endpoint::All[id - 1].path;
+  auto path = Endpoint::all[id - 1].path;
   modelPathTextBox.setText(path);
 }
 
