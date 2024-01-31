@@ -165,15 +165,15 @@ juce_add_plugin(${PROJECT_NAME}
     # VERSION ...                               # Set this if the plugin version is different to the project version
     # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     # ICON_SMALL ...
-    COMPANY_NAME "TEAMuP"             # Specify the name of the plugin's author
+    COMPANY_NAME "TechAudio"             # Specify the name of the plugin's author
     # IS_SYNTH FALSE                              # Is this a synth or an effect?
     # NEEDS_MIDI_INPUT FALSE                      # Does the plugin need midi input?
     # NEEDS_MIDI_OUTPUT FALSE                     # Does the plugin need midi output?
     # IS_MIDI_EFFECT FALSE                        # Is this plugin a MIDI effect?
     # EDITOR_WANTS_KEYBOARD_FOCUS FALSE           # Does the editor need keyboard focus?
     # COPY_PLUGIN_AFTER_BUILD False               # Should the plugin be installed to a default location after building?
-    PLUGIN_MANUFACTURER_CODE ADeC               # A four-character manufacturer id with at least one upper-case character
-    PLUGIN_CODE AraS                            # A unique four-character plugin id with exactly one upper-case character
+    PLUGIN_MANUFACTURER_CODE TATA               # A four-character manufacturer id with at least one upper-case character
+    PLUGIN_CODE THRP                            # A unique four-character plugin id with exactly one upper-case character
                                                 # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
                                                 # However this ID has been assigned before that behaviour was discovered, and remains as-is for backwards
                                                 # compatibility - GarageBand 10.3 does not support ARA anyways.

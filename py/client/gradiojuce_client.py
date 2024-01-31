@@ -117,4 +117,14 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    main(**vars(args))
+    try:
+        # Redirect standard output to a file with UTF-8 encoding
+        sys.stdout = open(args.output_path.replace("control_spec.json","control_spec_temp.json"), 'w', encoding='utf-8')
+        # Print or log the problematic string for debugging
+        print(f"Parse Args: {args}")
+        # Call the main function
+        main(**vars(args))
+    except Exception as e:
+        # Print the exception for debugging
+        print(f"Exception: {e}")
+        raise

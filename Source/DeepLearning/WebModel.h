@@ -105,14 +105,7 @@ public:
             .getChildFile("control_spec.json");
     outputPath.deleteFile();
 
-
-    // juce::File scriptPath = juce::File::getSpecialLocation(
-    //     juce::File::currentApplicationFile
-    // ).getChildFile("Contents/Resources/gradiojuce_client/gradiojuce_client");
-
-    juce::File scriptPath = juce::File::getSpecialLocation(
-        juce::File::currentApplicationFile
-    ).getParentDirectory().getChildFile("gradiojuce_client/gradiojuce_client.exe");
+    juce::File scriptPath = getScriptPath();
 
     juce::File tempLogFile =
     juce::File::getSpecialLocation(juce::File::tempDirectory)
@@ -120,8 +113,9 @@ public:
     tempLogFile.deleteFile();  // ensure the file doesn't already exist
 
     std::string command = (
-    //   "set PYTHONIOENCODING=UTF-8 && " +
-      "start /B cmd /c set PYTHONIOENCODING=UTF-8 && " +
+      #if JUCE_WINDOWS
+        "start /B cmd /c set PYTHONIOENCODING=UTF-8 && " +
+      #endif
       scriptPath.getFullPathName().toStdString()
       + " --mode get_ctrls"
       + " --url " + m_url
@@ -308,14 +302,7 @@ public:
             .getChildFile("ctrls_" + randomString + ".json");
     tempCtrlsFile.deleteFile();
 
-
-    // juce::File scriptPath = juce::File::getSpecialLocation(
-    //   juce::File::currentApplicationFile
-    // ).getChildFile("Contents/Resources/gradiojuce_client/gradiojuce_client");
-
-    juce::File scriptPath = juce::File::getSpecialLocation(
-        juce::File::currentApplicationFile
-    ).getParentDirectory().getChildFile("gradiojuce_client/gradiojuce_client.exe");
+    juce::File scriptPath = getScriptPath();
 
     LogAndDBG("scriptPath: " + scriptPath.getFullPathName());
     LogAndDBG("saving controls...");
@@ -329,7 +316,9 @@ public:
     tempLogFile.deleteFile();  // ensure the file doesn't already exist
 
     std::string command = (
-        // "start /B cmd /c " +
+        #if JUCE_WINDOWS
+          "start /B cmd /c set PYTHONIOENCODING=UTF-8 && " +
+        #endif
         scriptPath.getFullPathName().toStdString()
         + " --mode predict"
         + " --url " + m_url
@@ -403,6 +392,18 @@ public:
   }
 
 private:
+  juce::File getScriptPath() const {
+    #if JUCE_MAC
+      return juce::File::getSpecialLocation(
+        juce::File::currentApplicationFile
+      ).getChildFile("Contents/Resources/gradiojuce_client/gradiojuce_client");
+    #else
+      return juce::File::getSpecialLocation(
+          juce::File::currentApplicationFile
+      ).getChildFile("../../Resources/dist/gradiojuce_client/gradiojuce_client");
+    #endif
+  }
+
   juce::var loadJsonFromFile(const juce::File& file) const {
     juce::var result;
 
