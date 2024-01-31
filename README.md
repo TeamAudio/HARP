@@ -176,5 +176,22 @@ TODO
 5. build the plugin using this flag `-DCMAKE_BUILD_TYPE=Debug`
 6. run the debugger and add break poitns
 
+### Windows
+```
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "lldb reaper",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "c:/Program Files/REAPER (x64)/reaper.exe",
+            "args": [],
+            "cwd": "${fileDirname}",
+        }
+    ]
+}
+```
+
 <!-- ## Thanks -->
 <!-- Thanks to [shakfu]() for their help getting the relocatable python working for Mac OS,  and to Ryan Devens for meaningful conversations on the subject of JUCE and ARA programming.  -->
