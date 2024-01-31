@@ -22,6 +22,7 @@
  */
 
 #include "ProcessorEditor.h"
+#include "../DeepLearning/Endpoint.h"
 #include "../DeepLearning/WebModel.h"
 
 HARPProcessorEditor::HARPProcessorEditor(
@@ -97,6 +98,15 @@ HARPProcessorEditor::HARPProcessorEditor(
   mModelStatusTimer->addChangeListener(this);
   mModelStatusTimer->startTimer(100);  // 100 ms interval
 
+  // model combobox
+  int itemId = 1;
+  for (auto &endpoint : Endpoint::all) {
+    modelMenu.addItem(endpoint.name + " (" + endpoint.author() + ")", itemId++);
+  }
+  modelMenu.onChange = [this] { modelMenuChanged(); };
+  modelMenu.setSelectedId(1);
+  addAndMakeVisible(modelMenu);
+
   // model path textbox
   modelPathTextBox.setMultiLine(false);
   modelPathTextBox.setReturnKeyStartsNewLine(false);
@@ -146,6 +156,12 @@ HARPProcessorEditor::HARPProcessorEditor(
   // into the host UI
   setResizable(true, false);
   setSize(800, 500);
+}
+
+void HARPProcessorEditor::modelMenuChanged() {
+  auto id = modelMenu.getSelectedId();
+  auto path = Endpoint::all[id - 1].path;
+  modelPathTextBox.setText(path);
 }
 
 void HARPProcessorEditor::setModelCard(const ModelCard& card) {
@@ -267,7 +283,8 @@ void HARPProcessorEditor::resized() {
 
     // Row 1: Model Path TextBox and Load Model Button
     auto row1 = mainArea.removeFromTop(40);  // adjust height as needed
-    modelPathTextBox.setBounds(row1.removeFromLeft(row1.getWidth() * 0.8f).reduced(margin));
+    modelMenu.setBounds(row1.removeFromLeft(row1.getWidth() * 0.4f).reduced(margin));
+    modelPathTextBox.setBounds(row1.removeFromLeft(row1.getWidth() * 0.4f).reduced(margin));
     loadModelButton.setBounds(row1.reduced(margin));
 
     // Row 2: Glossary Label and Hyperlink
