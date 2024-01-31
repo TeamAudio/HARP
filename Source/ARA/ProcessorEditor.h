@@ -102,6 +102,8 @@ private:
 
   }
 
+  void modelMenuChanged();
+
   void setModelCard(const ModelCard& card);
 
 private:
@@ -110,6 +112,7 @@ private:
   std::unique_ptr<ModelStatusTimer> mModelStatusTimer {nullptr};
 
   unique_ptr<Component> documentView;
+  juce::ComboBox modelMenu;
   juce::TextEditor modelPathTextBox;
   juce::TextButton loadModelButton;
   juce::Label glossaryLabel;
