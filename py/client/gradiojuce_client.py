@@ -3,6 +3,7 @@ import argparse
 from gradio_client import Client
 from pathlib import Path
 import json
+import shutil
 import signal
 import time
 
@@ -52,7 +53,7 @@ def main(
         print(f"got ctrls: {ctrls}")
         # if it's a string, it's a filepath
         if isinstance(ctrls, str):
-            Path(ctrls).rename(output_path)
+            shutil.move(ctrls, output_path)
         # if it's not, likely that it's the actual controls
         else:
             print(f"Saving ctrls to {output_path}...")
@@ -94,7 +95,7 @@ def main(
             audio_path = job.result()
 
             print(f"Saving audio to {output_path}...")
-            Path(audio_path).rename(output_path)
+            shutil.move(audio_path, output_path)
         else:
             # still consume the result and block? 
             # job.result()
