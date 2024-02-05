@@ -107,34 +107,20 @@ public:
 
     juce::File scriptPath = getScriptPath();
 
-    juce::File tempLogFile =
-    juce::File::getSpecialLocation(juce::File::tempDirectory)
-        .getChildFile("system_get_ctrls_log.txt");
-    tempLogFile.deleteFile();  // ensure the file doesn't already exist
-
     std::string command = (
-      #if JUCE_WINDOWS
-        "start /B cmd /c set PYTHONIOENCODING=UTF-8 && " +
-      #endif
       scriptPath.getFullPathName().toStdString()
       + " --mode get_ctrls"
       + " --url " + m_url
       + " --output_path " + outputPath.getFullPathName().toStdString()
-      + " >> " + tempLogFile.getFullPathName().toStdString()   // redirect stdout to the temp log file
-      + " 2>&1"   // redirect stderr to the same file as stdout
     );
 
-    LogAndDBG("Running command: " + command);
-    // TODO: urgently need to find a better alternative to system
-    int result = std::system(command.c_str());
+    auto result = runCommand(command);
+    auto exitCode = result.first;
+    auto logContent = result.second;
 
-    juce::String logContent = tempLogFile.loadFileAsString();
-    LogAndDBG(logContent);
-    tempLogFile.deleteFile();  // delete the temporary log file
-
-    if (result != 0) {
+    if (exitCode != 0) {
         // read the text from the temp log file.
-        std::string message = "An error occurred while calling the gradiojuce helper with mode get_ctrls. Check the logs (~/Documents/HARP.log) for more details.\nLog content: " + logContent.toStdString();
+        std::string message = "An error occurred while calling the gradiojuce helper with mode get_ctrls. Check the logs (~/Documents/HARP.log) for more details.\nLog content: " + logContent;
         throw std::runtime_error(message);
     }
 
@@ -310,15 +296,7 @@ public:
       throw std::runtime_error("Failed to save controls to file.");
     }
 
-    juce::File tempLogFile =
-        juce::File::getSpecialLocation(juce::File::tempDirectory)
-            .getChildFile("system_log_" + randomString + ".txt");
-    tempLogFile.deleteFile();  // ensure the file doesn't already exist
-
     std::string command = (
-        #if JUCE_WINDOWS
-          "start /B cmd /c set PYTHONIOENCODING=UTF-8 && " +
-        #endif
         scriptPath.getFullPathName().toStdString()
         + " --mode predict"
         + " --url " + m_url
@@ -326,23 +304,17 @@ public:
         + " --ctrls_path " + tempCtrlsFile.getFullPathName().toStdString()
         + " --cancel_flag_path " + m_cancel_flag_file.getFullPathName().toStdString()
         + " --status_flag_path " + m_status_flag_file.getFullPathName().toStdString()
-        + " >> " + tempLogFile.getFullPathName().toStdString()   // redirect stdout to the temp log file
-        + " 2>&1"   // redirect stderr to the same file as stdout
     );
-    LogAndDBG("Running command: " + command);
-    // TODO: log commmand output to a file
-    int result = std::system(command.c_str());
 
-    juce::String logContent = tempLogFile.loadFileAsString();
-    LogAndDBG(logContent);
+    auto result = runCommand(command);
+    auto exitCode = result.first;
+    auto logContent = result.second;
 
-    if (result != 0) {
+    if (exitCode != 0) {
         // read the text from the temp log file.
-        std::string message = "An error occurred while calling the gradiojuce helper with mode predict. Check the logs (~/Documents/HARP.log) for more details.\nLog content: " + logContent.toStdString();
+        std::string message = "An error occurred while calling the gradiojuce helper with mode predict. Check the logs (~/Documents/HARP.log) for more details.\nLog content: " + logContent;
         throw std::runtime_error(message);
     }
-
-    tempLogFile.deleteFile();  // delete the temporary log file
 
     // read the output file to a buffer
     // TODO: the sample rate should not be the incoming sample rate, but
@@ -402,6 +374,21 @@ private:
           juce::File::currentApplicationFile
       ).getChildFile("../../Resources/dist/gradiojuce_client/gradiojuce_client");
     #endif
+  }
+
+  std::pair<int, std::string> runCommand(const std::string& command) const {
+    LogAndDBG("Running command: " + command);
+
+    juce::ChildProcess process;
+    process.start(command);
+
+    auto output = process.readAllProcessOutput();
+    auto exitCode = process.getExitCode();
+
+    LogAndDBG("Command finished with exit code: " + std::to_string(exitCode));
+    LogAndDBG("Command output: " + output);
+
+    return {exitCode, output.toStdString()};
   }
 
   juce::var loadJsonFromFile(const juce::File& file) const {
